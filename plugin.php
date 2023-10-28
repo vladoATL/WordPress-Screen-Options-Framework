@@ -141,11 +141,12 @@ class WordPressScreenOptionsDemo {
 			</div>
 			<ul class="screen-options-list">
 				<?php
+				$user_meta = maybe_unserialize($user_meta);
 				foreach ( $this->options() as $option_name ) {
-					$option     = "wordpress_screen_options_demo_$option_name";
+					$option     = "wordpress_screen_options_demo_$option_name";					
 					if ( $user_meta ) {
-						$user_value = isset( $user_meta[ $option_name ] ) ? 'true' : 'false';
-					} else {
+						$user_value = isset( $user_meta[0][ $option_name ] ) ? 'true' : 'false';
+						} else {
 						$user_value = var_export( $screen->get_option( $option, 'value' ), true );
 					}
 					?>
