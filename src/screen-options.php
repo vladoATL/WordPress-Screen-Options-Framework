@@ -65,7 +65,7 @@ class WordPressScreenOptionsFramework {
 
 		add_action( "load-$admin_page", [ $this, 'get_screen_options' ] );
 		add_filter( 'screen_settings', [ $this, 'show_screen_options' ], 10, 2 );
-		add_filter( 'set-screen-option', [ $this, 'set_option' ], 11, 3 );
+		add_filter( 'set-screen-option', [ $this, 'set_option' ], 15, 3 );
 	}
 
 	/**
@@ -114,7 +114,7 @@ class WordPressScreenOptionsFramework {
 			<input type="hidden" name="wp_screen_options_nonce" value="<?php echo esc_textarea( wp_create_nonce( 'wp_screen_options_nonce' ) ); ?>">
 			<legend><?php esc_html_e( 'WordPress Screen Options Demo', 'wp-screen-options-framework' ); ?></legend>
 			<div class="metabox-prefs">
-				<div><input type="hidden" name="wp_screen_options[option]" value="wordpress_screen_options_demo_options" /></div>
+				<div><input type="hidden" name="wp_screen_options[option]" value="wordpress_screen_options_demo_options_page" /></div>
 				<div><input type="hidden" name="wp_screen_options[value]" value="yes" /></div>
 				<div class="wordpress_screen_options_demo_custom_fields">
 		<?php
@@ -143,11 +143,12 @@ class WordPressScreenOptionsFramework {
 	public function show_option( $title, $option ) {
 		$screen    = get_current_screen();
 		$id        = "wordpress_screen_options_demo_$option";
-		$user_meta = get_usermeta( get_current_user_id(), 'wordpress_screen_options_demo_options' );
-
+		$user_meta = get_user_meta( get_current_user_id(), 'wordpress_screen_options_demo_options_page' );
+		$user_meta = maybe_unserialize($user_meta);
+		
 		// Check if the screen options have been saved. If so, use the saved value. Otherwise, use the default values.
 		if ( $user_meta ) {
-			$checked = array_key_exists( $option, $user_meta );
+			$checked = isset( $user_meta[0][$option]);	
 		} else {
 			$checked = $screen->get_option( $id, 'value' ) ? true : false;
 		}
@@ -191,12 +192,12 @@ class WordPressScreenOptionsFramework {
 	 */
 	public function set_option( $status, $option, $value ) {
 		if ( isset( $_POST['wp_screen_options_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['wp_screen_options_nonce'] ) ), 'wp_screen_options_nonce' ) ) {
-			if ( 'wordpress_screen_options_demo_options' === $option ) {
+			if ( 'wordpress_screen_options_demo_options_page' === $option ) {
 				$value = isset( $_POST['wordpress_screen_options_demo'] ) && is_array( $_POST['wordpress_screen_options_demo'] ) ? $_POST['wordpress_screen_options_demo'] : []; // WPCS: Sanitization ok.
 			}
 		}
 
-		return $value;
+		return  $value;
 	}
 }
 
